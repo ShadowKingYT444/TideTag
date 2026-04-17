@@ -1,8 +1,10 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { getObservation, listObservations } from '@/lib/data';
 import { CATEGORIES, SEVERITY_COLORS } from '@/lib/types';
 import { SeverityBadge } from '@/components/SeverityBadge';
+import { TideContext } from '@/components/TideContext';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,17 +41,20 @@ export default function ObservationDetailPage({
       <div>
         <Link
           href="/observations"
-          className="text-sm font-medium text-tide-700 hover:text-tide-800"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-tide-700 hover:text-tide-800"
         >
-          ← All observations
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 4l-6 6 6 6M6 10h12" />
+          </svg>
+          All observations
         </Link>
       </div>
 
       <header className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
-          <span>{cat?.emoji}</span>
-          <span className="font-medium text-slate-700">{cat?.label}</span>
-          <span>·</span>
+        <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-500">
+          <span aria-hidden className="text-sm">{cat?.emoji}</span>
+          <span className="text-slate-700">{cat?.label}</span>
+          <span className="text-slate-300">·</span>
           <time dateTime={obs.createdAt}>
             {date.toLocaleDateString(undefined, {
               weekday: 'short',
@@ -64,32 +69,36 @@ export default function ObservationDetailPage({
             })}
           </time>
         </div>
-        <h1 className="text-3xl font-semibold tracking-tight">
+        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
           {obs.locationName}
         </h1>
-        <p className="text-slate-600">{obs.description}</p>
-        <div className="flex items-center gap-2 text-sm text-slate-500">
+        <p className="text-base leading-relaxed text-slate-600">{obs.description}</p>
+        <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
           <span>by {obs.observer}</span>
-          <span>·</span>
-          <span className="font-mono">
+          <span className="text-slate-300">·</span>
+          <span className="font-mono text-xs">
             {obs.lat.toFixed(4)}, {obs.lng.toFixed(4)}
           </span>
         </div>
       </header>
 
       {/* ── Analysis Card ──────────────────────────────────────── */}
-      <section className="tide-card p-6">
-        <h2 className="text-lg font-semibold">Analysis</h2>
-        <div className="mt-4 flex flex-wrap items-center gap-4">
+      <section className="glass p-6">
+        <h2 className="text-base font-semibold tracking-tight text-slate-900">
+          Analysis
+        </h2>
+        <div className="mt-5 flex flex-wrap items-center gap-4">
           <SeverityBadge severity={obs.severity} />
           <div className="flex-1">
             <div className="flex items-end justify-between text-sm">
               <span className="font-medium text-slate-700">Anomaly score</span>
-              <span className="font-mono font-bold">{(obs.anomalyScore * 100).toFixed(0)}%</span>
+              <span className="font-mono text-sm font-semibold text-slate-900">
+                {(obs.anomalyScore * 100).toFixed(0)}%
+              </span>
             </div>
-            <div className="mt-1 h-3 w-full overflow-hidden rounded-full bg-slate-100">
+            <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100/80 ring-1 ring-inset ring-slate-200/60">
               <div
-                className="h-full rounded-full"
+                className="h-full rounded-full transition-all"
                 style={{
                   width: `${Math.max(2, obs.anomalyScore * 100)}%`,
                   background: SEVERITY_COLORS[obs.severity],
@@ -100,15 +109,15 @@ export default function ObservationDetailPage({
         </div>
 
         {obs.indicators.length > 0 && (
-          <div className="mt-4">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <div className="mt-5">
+            <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
               Detected indicators
             </h3>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {obs.indicators.map((tag) => (
                 <span
                   key={tag}
-                  className="pill bg-slate-100 text-slate-700 ring-1 ring-inset ring-slate-200"
+                  className="pill bg-slate-100/70 text-slate-700 ring-1 ring-inset ring-slate-200/80"
                 >
                   {tag}
                 </span>
@@ -118,11 +127,18 @@ export default function ObservationDetailPage({
         )}
       </section>
 
+      {/* ── Tidal context (NOAA) ───────────────────────────────── */}
+      <Suspense fallback={<TideSkeleton />}>
+        <TideContext lat={obs.lat} lng={obs.lng} />
+      </Suspense>
+
       {/* ── Measurements ───────────────────────────────────────── */}
       {obs.measurements && Object.values(obs.measurements).some((v) => v !== undefined) && (
-        <section className="tide-card p-6">
-          <h2 className="text-lg font-semibold">Measurements</h2>
-          <dl className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <section className="glass p-6">
+          <h2 className="text-base font-semibold tracking-tight text-slate-900">
+            Measurements
+          </h2>
+          <dl className="mt-5 grid grid-cols-2 gap-6 sm:grid-cols-3">
             {obs.measurements.turbidityNTU !== undefined && (
               <Measurement label="Turbidity" value={obs.measurements.turbidityNTU} unit="NTU" />
             )}
@@ -145,7 +161,9 @@ export default function ObservationDetailPage({
       {/* ── Nearby observations ────────────────────────────────── */}
       {nearby.length > 0 && (
         <section>
-          <h2 className="text-lg font-semibold">Nearby observations</h2>
+          <h2 className="text-base font-semibold tracking-tight text-slate-900">
+            Nearby observations
+          </h2>
           <div className="mt-4 grid gap-3">
             {nearby.map((o) => {
               const nCat = catMap[o.category];
@@ -154,12 +172,12 @@ export default function ObservationDetailPage({
                 <Link
                   key={o.id}
                   href={`/observations/${o.id}`}
-                  className="tide-card flex items-center gap-4 p-4 hover:bg-white/90"
+                  className="glass flex items-center gap-4 p-4 transition hover:-translate-y-0.5 hover:shadow-glass-lg"
                 >
                   <span className="text-xl">{nCat?.emoji}</span>
                   <div className="min-w-0 flex-1">
-                    <div className="truncate font-medium text-slate-900">{o.locationName}</div>
-                    <div className="truncate text-sm text-slate-500">
+                    <div className="truncate font-semibold text-slate-900">{o.locationName}</div>
+                    <div className="truncate text-xs text-slate-500">
                       {nDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · {o.observer}
                     </div>
                   </div>
@@ -185,13 +203,27 @@ function Measurement({
 }) {
   return (
     <div>
-      <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+      <dt className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
         {label}
       </dt>
-      <dd className="mt-0.5 text-2xl font-bold text-slate-900">
-        {value}
-        {unit && <span className="ml-1 text-sm font-normal text-slate-500">{unit}</span>}
+      <dd className="mt-1 flex items-baseline gap-1 text-2xl font-semibold text-slate-900">
+        <span>{value}</span>
+        {unit && <span className="text-sm font-normal text-slate-500">{unit}</span>}
       </dd>
     </div>
+  );
+}
+
+function TideSkeleton() {
+  return (
+    <section className="glass p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="h-5 w-36 animate-pulse rounded bg-slate-200/70" />
+          <div className="mt-2 h-3 w-64 animate-pulse rounded bg-slate-200/60" />
+        </div>
+      </div>
+      <div className="mt-6 h-24 animate-pulse rounded-xl bg-slate-100/80" />
+    </section>
   );
 }

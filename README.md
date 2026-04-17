@@ -14,6 +14,7 @@ CV + geospatial model pipeline. Ready to deploy to Vercel with zero config.
 - 🗺️ Live Leaflet map of observations, colored by severity
 - 📊 Dashboard with contributor, observation, and alert counts
 - 🤖 `POST /api/analyze` — heuristic anomaly scoring + severity
+- 🌀 `GET /api/tides` — live tide predictions from the nearest NOAA CO-OPS station
 - 🏫 Programs page covering the 5 school- and community-based initiatives
 - 📱 Mobile-first submission form with "Use my location"
 
@@ -45,6 +46,7 @@ Visit http://localhost:3000.
 | GET    | `/api/observations/:id`   | Fetch a single observation            |
 | GET    | `/api/stats`              | Dashboard aggregates                  |
 | POST   | `/api/analyze`            | Run anomaly heuristics                |
+| GET    | `/api/tides?lat=&lng=`    | Nearest NOAA station + tide forecast  |
 
 Example:
 

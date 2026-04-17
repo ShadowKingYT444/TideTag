@@ -83,7 +83,7 @@ export function NewObservationForm() {
       setTimeout(() => {
         router.push('/observations');
         router.refresh();
-      }, 1800);
+      }, 1600);
     } catch (err) {
       setState('error');
       setError(err instanceof Error ? err.message : 'Network error');
@@ -91,111 +91,115 @@ export function NewObservationForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-5">
-      <div className="grid gap-5 md:grid-cols-2">
-        <Field label="Observer name" required>
-          <input
-            type="text"
-            value={form.observer}
-            onChange={(e) => update('observer', e.target.value)}
-            required
-            className="tt-input"
-            placeholder="Your name or team"
-          />
-        </Field>
-        <Field label="Location name" required>
-          <input
-            type="text"
-            value={form.locationName}
-            onChange={(e) => update('locationName', e.target.value)}
-            required
-            className="tt-input"
-            placeholder="e.g. Jamaica Bay outfall channel"
-          />
-        </Field>
-      </div>
-
-      <div className="grid gap-5 md:grid-cols-[1fr_1fr_auto]">
-        <Field label="Latitude" required>
-          <input
-            type="number"
-            step="0.00001"
-            min={-90}
-            max={90}
-            value={form.lat}
-            onChange={(e) => update('lat', e.target.value)}
-            required
-            className="tt-input"
-          />
-        </Field>
-        <Field label="Longitude" required>
-          <input
-            type="number"
-            step="0.00001"
-            min={-180}
-            max={180}
-            value={form.lng}
-            onChange={(e) => update('lng', e.target.value)}
-            required
-            className="tt-input"
-          />
-        </Field>
-        <div className="flex items-end">
-          <button
-            type="button"
-            onClick={useMyLocation}
-            className="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 hover:bg-slate-100"
-          >
-            Use my location
-          </button>
+    <form onSubmit={handleSubmit} className="grid gap-6">
+      <div className="glass p-6">
+        <SectionTitle label="Reporter" index="01" />
+        <div className="mt-4 grid gap-5 md:grid-cols-2">
+          <Field label="Observer name" required>
+            <input
+              type="text"
+              value={form.observer}
+              onChange={(e) => update('observer', e.target.value)}
+              required
+              className="tt-input"
+              placeholder="Your name or team"
+            />
+          </Field>
+          <Field label="Location name" required>
+            <input
+              type="text"
+              value={form.locationName}
+              onChange={(e) => update('locationName', e.target.value)}
+              required
+              className="tt-input"
+              placeholder="e.g. Jamaica Bay outfall channel"
+            />
+          </Field>
         </div>
       </div>
 
-      <Field label="Category" required>
-        <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map((c) => (
-            <button
-              type="button"
-              key={c.value}
-              onClick={() => update('category', c.value)}
-              className={
-                'rounded-full px-3 py-1.5 text-sm font-medium transition ' +
-                (form.category === c.value
-                  ? 'bg-tide-600 text-white'
-                  : 'bg-white text-slate-700 ring-1 ring-inset ring-slate-200 hover:bg-slate-100')
-              }
-            >
-              {c.emoji} {c.label}
+      <div className="glass p-6">
+        <SectionTitle label="Where" index="02" />
+        <div className="mt-4 grid gap-5 md:grid-cols-[1fr_1fr_auto]">
+          <Field label="Latitude" required>
+            <input
+              type="number"
+              step="0.00001"
+              min={-90}
+              max={90}
+              value={form.lat}
+              onChange={(e) => update('lat', e.target.value)}
+              required
+              className="tt-input font-mono"
+            />
+          </Field>
+          <Field label="Longitude" required>
+            <input
+              type="number"
+              step="0.00001"
+              min={-180}
+              max={180}
+              value={form.lng}
+              onChange={(e) => update('lng', e.target.value)}
+              required
+              className="tt-input font-mono"
+            />
+          </Field>
+          <div className="flex items-end">
+            <button type="button" onClick={useMyLocation} className="btn-secondary h-[46px]">
+              <LocationIcon />
+              Use my location
             </button>
-          ))}
+          </div>
         </div>
-      </Field>
+      </div>
 
-      <Field label="Description" required>
-        <textarea
-          value={form.description}
-          onChange={(e) => update('description', e.target.value)}
-          required
-          rows={4}
-          className="tt-input"
-          placeholder="What did you see? Water color, debris, wildlife, smells, recent weather…"
-        />
-      </Field>
+      <div className="glass p-6">
+        <SectionTitle label="What" index="03" />
+        <div className="mt-4 grid gap-5">
+          <Field label="Category" required>
+            <div className="flex flex-wrap gap-2">
+              {CATEGORIES.map((c) => (
+                <button
+                  type="button"
+                  key={c.value}
+                  onClick={() => update('category', c.value)}
+                  className={
+                    'chip inline-flex items-center gap-1.5 ' +
+                    (form.category === c.value ? 'chip-active' : '')
+                  }
+                >
+                  <span aria-hidden>{c.emoji}</span> {c.label}
+                </button>
+              ))}
+            </div>
+          </Field>
+          <Field label="Description" required>
+            <textarea
+              value={form.description}
+              onChange={(e) => update('description', e.target.value)}
+              required
+              rows={4}
+              className="tt-input"
+              placeholder="What did you see? Water color, debris, wildlife, smells, recent weather…"
+            />
+          </Field>
+          <Field label="Photo URL (optional)">
+            <input
+              type="url"
+              value={form.photoUrl}
+              onChange={(e) => update('photoUrl', e.target.value)}
+              className="tt-input"
+              placeholder="https://…"
+            />
+          </Field>
+        </div>
+      </div>
 
-      <Field label="Photo URL (optional)">
-        <input
-          type="url"
-          value={form.photoUrl}
-          onChange={(e) => update('photoUrl', e.target.value)}
-          className="tt-input"
-          placeholder="https://…"
-        />
-      </Field>
-
-      <fieldset className="tide-card p-5">
-        <legend className="px-2 text-sm font-semibold">Measurements (optional)</legend>
+      <div className="glass p-6">
+        <SectionTitle label="Measurements" index="04" optional />
         <p className="mt-1 text-sm text-slate-500">
-          If you have a water-quality meter handy, enter any of these:
+          If you have a water-quality meter handy, enter any of these.
         </p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
           <Field label="Turbidity (NTU)">
@@ -205,7 +209,7 @@ export function NewObservationForm() {
               min={0}
               value={form.turbidityNTU}
               onChange={(e) => update('turbidityNTU', e.target.value)}
-              className="tt-input"
+              className="tt-input font-mono"
             />
           </Field>
           <Field label="pH">
@@ -216,7 +220,7 @@ export function NewObservationForm() {
               max={14}
               value={form.pH}
               onChange={(e) => update('pH', e.target.value)}
-              className="tt-input"
+              className="tt-input font-mono"
             />
           </Field>
           <Field label="Water temp (°C)">
@@ -225,7 +229,7 @@ export function NewObservationForm() {
               step="0.1"
               value={form.waterTempC}
               onChange={(e) => update('waterTempC', e.target.value)}
-              className="tt-input"
+              className="tt-input font-mono"
             />
           </Field>
           <Field label="Salinity (PPT)">
@@ -235,7 +239,7 @@ export function NewObservationForm() {
               min={0}
               value={form.salinityPPT}
               onChange={(e) => update('salinityPPT', e.target.value)}
-              className="tt-input"
+              className="tt-input font-mono"
             />
           </Field>
           <Field label="Dissolved O₂ (mg/L)">
@@ -245,60 +249,65 @@ export function NewObservationForm() {
               min={0}
               value={form.dissolvedO2}
               onChange={(e) => update('dissolvedO2', e.target.value)}
-              className="tt-input"
+              className="tt-input font-mono"
             />
           </Field>
         </div>
-      </fieldset>
+      </div>
 
       {state === 'success' && (
-        <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800" role="status">
-          Observation submitted! Severity and indicators have been assigned automatically. Redirecting…
+        <div className="rounded-xl border border-green-200/70 bg-green-50/80 px-4 py-3 text-sm text-green-800 backdrop-blur" role="status">
+          Observation submitted. Severity and indicators have been assigned automatically. Redirecting…
         </div>
       )}
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">
+        <div className="rounded-xl border border-red-200/70 bg-red-50/80 px-4 py-3 text-sm text-red-800 backdrop-blur" role="alert">
           {error}
         </div>
       )}
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <button
           type="submit"
           disabled={state === 'submitting' || state === 'success'}
-          className="rounded-lg bg-tide-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-tide-700 disabled:opacity-60"
+          className="btn-primary"
         >
-          {state === 'submitting' ? 'Submitting…' : state === 'success' ? 'Submitted!' : 'Submit observation'}
+          {state === 'submitting'
+            ? 'Submitting…'
+            : state === 'success'
+            ? 'Submitted'
+            : 'Submit observation'}
         </button>
         <p className="text-xs text-slate-500">
           Severity and indicators are assigned automatically.
         </p>
       </div>
-
-      <style jsx global>{`
-        .tt-input {
-          display: block;
-          width: 100%;
-          border-radius: 0.5rem;
-          border: 1px solid rgb(203 213 225);
-          background: #fff;
-          padding: 0.5rem 0.75rem;
-          font-size: 0.875rem;
-          color: rgb(15 23 42);
-          outline: none;
-          transition: box-shadow 0.15s, border-color 0.15s;
-        }
-        .tt-input:focus {
-          border-color: rgb(45 144 255);
-          box-shadow: 0 0 0 3px rgba(45, 144, 255, 0.2);
-        }
-        textarea.tt-input {
-          min-height: 6rem;
-          resize: vertical;
-        }
-      `}</style>
     </form>
+  );
+}
+
+function SectionTitle({
+  label,
+  index,
+  optional,
+}: {
+  label: string;
+  index: string;
+  optional?: boolean;
+}) {
+  return (
+    <div className="flex items-baseline gap-3">
+      <span className="font-mono text-[11px] font-semibold tracking-[0.18em] text-slate-400">
+        {index}
+      </span>
+      <h2 className="text-base font-semibold tracking-tight text-slate-900">
+        {label}
+        {optional && (
+          <span className="ml-2 text-xs font-normal text-slate-400">optional</span>
+        )}
+      </h2>
+    </div>
   );
 }
 
@@ -313,11 +322,19 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-sm font-medium text-slate-700">
+      <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
         {label}
-        {required && <span className="ml-0.5 text-red-600">*</span>}
+        {required && <span className="ml-1 text-red-500">*</span>}
       </span>
       {children}
     </label>
+  );
+}
+
+function LocationIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M10 18s-6-5.2-6-10a6 6 0 1 1 12 0c0 4.8-6 10-6 10z" /><circle cx="10" cy="8" r="2" />
+    </svg>
   );
 }

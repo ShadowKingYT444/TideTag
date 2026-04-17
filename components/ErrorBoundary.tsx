@@ -15,9 +15,11 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.error) {
       return (
-        <div className="mx-auto max-w-lg py-20 text-center">
-          <div className="text-4xl">🌊</div>
-          <h2 className="mt-4 text-xl font-semibold text-slate-900">
+        <div className="mx-auto flex max-w-md flex-col items-center py-20 text-center">
+          <div className="glass flex h-16 w-16 items-center justify-center rounded-2xl text-3xl">
+            🌊
+          </div>
+          <h2 className="mt-6 text-xl font-semibold text-slate-900">
             Something went wrong
           </h2>
           <p className="mt-2 text-sm text-slate-600">
@@ -26,7 +28,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <button
             type="button"
             onClick={() => this.setState({ error: null })}
-            className="mt-4 rounded-lg bg-tide-600 px-4 py-2 text-sm font-semibold text-white hover:bg-tide-700"
+            className="btn-primary mt-5"
           >
             Try again
           </button>

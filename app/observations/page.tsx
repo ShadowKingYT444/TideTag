@@ -15,57 +15,77 @@ export default function ObservationsPage({ searchParams }: { searchParams: Searc
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Observations</h1>
-          <p className="mt-1 text-slate-600">
+          <span className="section-eyebrow">Network feed</span>
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+            Observations
+          </h1>
+          <p className="mt-2 text-slate-600">
             {items.length} observation{items.length === 1 ? '' : 's'} in the current view.
           </p>
         </div>
-        <Link
-          href="/observations/new"
-          className="rounded-lg bg-tide-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-tide-700"
-        >
-          + New observation
+        <Link href="/observations/new" className="btn-primary">
+          <PlusIcon />
+          New observation
         </Link>
       </header>
 
-      <div className="flex flex-wrap gap-2">
-        <FilterLink param="category" value={undefined} active={!searchParams.category}>
-          All
-        </FilterLink>
-        {CATEGORIES.map((c) => (
-          <FilterLink
-            key={c.value}
-            param="category"
-            value={c.value}
-            active={searchParams.category === c.value}
-          >
-            {c.emoji} {c.label}
+      <div className="glass p-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+            Category
+          </span>
+          <FilterLink param="category" value={undefined} active={!searchParams.category}>
+            All
           </FilterLink>
-        ))}
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        <FilterLink param="severity" value={undefined} active={!searchParams.severity}>
-          Any severity
-        </FilterLink>
-        {(['info', 'watch', 'alert'] as const).map((s) => (
-          <FilterLink
-            key={s}
-            param="severity"
-            value={s}
-            active={searchParams.severity === s}
-          >
-            {s}
+          {CATEGORIES.map((c) => (
+            <FilterLink
+              key={c.value}
+              param="category"
+              value={c.value}
+              active={searchParams.category === c.value}
+            >
+              <span aria-hidden>{c.emoji}</span> {c.label}
+            </FilterLink>
+          ))}
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-200/60 pt-3">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+            Severity
+          </span>
+          <FilterLink param="severity" value={undefined} active={!searchParams.severity}>
+            Any
           </FilterLink>
-        ))}
+          {(['info', 'watch', 'alert'] as const).map((s) => (
+            <FilterLink
+              key={s}
+              param="severity"
+              value={s}
+              active={searchParams.severity === s}
+            >
+              {s}
+            </FilterLink>
+          ))}
+        </div>
       </div>
 
       {items.length === 0 ? (
-        <div className="tide-card p-10 text-center text-slate-500">
-          No observations match these filters.
+        <div className="glass p-12 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" />
+            </svg>
+          </div>
+          <p className="mt-3 font-medium text-slate-700">No observations match these filters.</p>
+          <p className="mt-1 text-sm text-slate-500">
+            Try clearing a filter or{' '}
+            <Link href="/observations/new" className="font-medium text-tide-700 hover:text-tide-800">
+              submit the first one
+            </Link>
+            .
+          </p>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -90,15 +110,20 @@ function FilterLink({
   children: React.ReactNode;
 }) {
   const query = value ? `?${param}=${value}` : '';
-  const classes = active
-    ? 'bg-slate-900 text-white'
-    : 'bg-white text-slate-700 hover:bg-slate-100 ring-1 ring-inset ring-slate-200';
   return (
     <Link
       href={`/observations${query}`}
-      className={`rounded-full px-3 py-1 text-xs font-medium ${classes}`}
+      className={'chip inline-flex items-center gap-1.5 ' + (active ? 'chip-active' : '')}
     >
       {children}
     </Link>
+  );
+}
+
+function PlusIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M10 4v12M4 10h12" />
+    </svg>
   );
 }
