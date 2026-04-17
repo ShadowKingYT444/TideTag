@@ -1,10 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
-  content: [
-    './app/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-  ],
+  content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
@@ -22,13 +19,44 @@ const config: Config = {
           950: '#0d2657',
         },
         kelp: {
+          400: '#34a88a',
           500: '#0e7c66',
           600: '#0a6754',
           700: '#0a5444',
         },
+        ink: {
+          900: '#0b1220',
+          800: '#0f1a2e',
+          700: '#16223a',
+        },
       },
       fontFamily: {
-        sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sans: ['var(--font-inter)', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['var(--font-mono)', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+      },
+      boxShadow: {
+        glass: '0 1px 2px rgba(15,23,42,0.04), 0 10px 30px -15px rgba(15,23,42,0.18)',
+        'glass-lg': '0 1px 2px rgba(15,23,42,0.04), 0 24px 60px -25px rgba(15,23,42,0.28)',
+        'inner-glass': 'inset 0 1px 0 rgba(255,255,255,0.8)',
+      },
+      borderRadius: {
+        xl: '0.875rem',
+        '2xl': '1.125rem',
+        '3xl': '1.5rem',
+      },
+      keyframes: {
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+        fadeUp: {
+          '0%': { opacity: '0', transform: 'translateY(6px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
+      animation: {
+        shimmer: 'shimmer 2s linear infinite',
+        'fade-up': 'fadeUp 400ms ease-out both',
       },
     },
   },

@@ -105,7 +105,7 @@ export function InlineAnalyzer() {
   }, [category, description, turbidity, pH, temp, dO2]);
 
   useEffect(() => {
-    const t = setTimeout(runAnalysis, 350);
+    const t = setTimeout(runAnalysis, 300);
     return () => clearTimeout(t);
   }, [runAnalysis]);
 
@@ -119,10 +119,10 @@ export function InlineAnalyzer() {
     setDO2(p.dissolvedO2);
   }
 
-  const severityColor: Record<Severity, string> = {
-    info: 'bg-tide-100 text-tide-900 ring-tide-300',
-    watch: 'bg-amber-100 text-amber-900 ring-amber-300',
-    alert: 'bg-red-100 text-red-900 ring-red-300',
+  const severityStyle: Record<Severity, string> = {
+    info: 'bg-tide-50 text-tide-900 ring-tide-200',
+    watch: 'bg-amber-50 text-amber-900 ring-amber-200',
+    alert: 'bg-red-50 text-red-900 ring-red-200',
   };
 
   const scoreBarColor: Record<Severity, string> = {
@@ -134,9 +134,9 @@ export function InlineAnalyzer() {
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
       {/* ── Input Panel ──────────────────────────────────────────── */}
-      <div className="space-y-4">
+      <div className="glass space-y-5 p-6">
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">
+          <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
             Load a preset scenario
           </label>
           <div className="flex flex-wrap gap-2">
@@ -145,7 +145,7 @@ export function InlineAnalyzer() {
                 key={p.name}
                 type="button"
                 onClick={() => loadPreset(i)}
-                className="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-200 hover:bg-slate-100"
+                className="chip"
               >
                 {p.name}
               </button>
@@ -154,28 +154,25 @@ export function InlineAnalyzer() {
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">Category</label>
+          <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+            Category
+          </label>
           <div className="flex flex-wrap gap-2">
             {CATEGORIES.map((c) => (
               <button
                 key={c.value}
                 type="button"
                 onClick={() => setCategory(c.value)}
-                className={
-                  'rounded-full px-3 py-1.5 text-sm font-medium transition ' +
-                  (category === c.value
-                    ? 'bg-tide-600 text-white'
-                    : 'bg-white text-slate-700 ring-1 ring-inset ring-slate-200 hover:bg-slate-100')
-                }
+                className={'chip inline-flex items-center gap-1.5 ' + (category === c.value ? 'chip-active' : '')}
               >
-                {c.emoji} {c.label}
+                <span aria-hidden>{c.emoji}</span> {c.label}
               </button>
             ))}
           </div>
         </div>
 
         <div>
-          <label htmlFor="az-desc" className="mb-1 block text-sm font-medium text-slate-700">
+          <label htmlFor="az-desc" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
             Description
           </label>
           <textarea
@@ -183,97 +180,59 @@ export function InlineAnalyzer() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
-            className="az-input"
+            className="tt-input"
             placeholder="Describe what you observed…"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div>
-            <label htmlFor="az-turb" className="mb-1 block text-xs font-medium text-slate-600">
-              Turbidity (NTU)
-            </label>
-            <input
-              id="az-turb"
-              type="number"
-              step="0.1"
-              min={0}
-              value={turbidity}
-              onChange={(e) => setTurbidity(e.target.value)}
-              className="az-input"
-            />
-          </div>
-          <div>
-            <label htmlFor="az-ph" className="mb-1 block text-xs font-medium text-slate-600">
-              pH
-            </label>
-            <input
-              id="az-ph"
-              type="number"
-              step="0.01"
-              min={0}
-              max={14}
-              value={pH}
-              onChange={(e) => setPH(e.target.value)}
-              className="az-input"
-            />
-          </div>
-          <div>
-            <label htmlFor="az-temp" className="mb-1 block text-xs font-medium text-slate-600">
-              Water temp (°C)
-            </label>
-            <input
-              id="az-temp"
-              type="number"
-              step="0.1"
-              value={temp}
-              onChange={(e) => setTemp(e.target.value)}
-              className="az-input"
-            />
-          </div>
-          <div>
-            <label htmlFor="az-do2" className="mb-1 block text-xs font-medium text-slate-600">
-              Dissolved O₂
-            </label>
-            <input
-              id="az-do2"
-              type="number"
-              step="0.1"
-              min={0}
-              value={dO2}
-              onChange={(e) => setDO2(e.target.value)}
-              className="az-input"
-            />
-          </div>
+          <AzField label="Turbidity (NTU)" id="az-turb" value={turbidity} onChange={setTurbidity} step="0.1" min={0} />
+          <AzField label="pH" id="az-ph" value={pH} onChange={setPH} step="0.01" min={0} max={14} />
+          <AzField label="Temp (°C)" id="az-temp" value={temp} onChange={setTemp} step="0.1" />
+          <AzField label="DO (mg/L)" id="az-do2" value={dO2} onChange={setDO2} step="0.1" min={0} />
         </div>
       </div>
 
       {/* ── Result Panel ─────────────────────────────────────────── */}
-      <div className="tide-card flex flex-col p-5">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-          Analysis result
-          {loading && (
-            <span className="ml-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-tide-600" />
-          )}
-        </h3>
+      <div className="glass flex flex-col p-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+            Analysis result
+          </h3>
+          <span
+            className={
+              'pill ring-1 ring-inset transition ' +
+              (loading
+                ? 'bg-slate-100 text-slate-500 ring-slate-200'
+                : 'bg-kelp-500/10 text-kelp-700 ring-kelp-400/30')
+            }
+          >
+            <span
+              className={
+                'h-1.5 w-1.5 rounded-full ' +
+                (loading ? 'bg-slate-400 animate-pulse' : 'bg-kelp-500')
+              }
+            />
+            {loading ? 'Analyzing' : 'Live'}
+          </span>
+        </div>
 
         {result ? (
-          <div className="mt-4 flex flex-1 flex-col gap-5">
-            {/* Severity + Score */}
-            <div className="flex items-center gap-3">
+          <div className="mt-5 flex flex-1 flex-col gap-6">
+            <div className="flex items-center gap-4">
               <span
-                className={`rounded-full px-3 py-1 text-sm font-bold uppercase ring-1 ring-inset ${severityColor[result.severity]}`}
+                className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider ring-1 ring-inset ${severityStyle[result.severity]}`}
               >
                 {result.severity}
               </span>
               <div className="flex-1">
                 <div className="flex items-end justify-between text-sm">
                   <span className="font-medium text-slate-700">Anomaly score</span>
-                  <span className="font-mono font-bold text-slate-900">
+                  <span className="font-mono text-sm font-semibold text-slate-900">
                     {(result.anomalyScore * 100).toFixed(0)}%
                   </span>
                 </div>
-                <div className="mt-1 h-3 w-full overflow-hidden rounded-full bg-slate-100">
+                <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100/80 ring-1 ring-inset ring-slate-200/60">
                   <div
                     className={`h-full rounded-full bg-gradient-to-r transition-all duration-500 ${scoreBarColor[result.severity]}`}
                     style={{ width: `${Math.max(2, result.anomalyScore * 100)}%` }}
@@ -282,17 +241,16 @@ export function InlineAnalyzer() {
               </div>
             </div>
 
-            {/* Indicators */}
             {result.indicators.length > 0 && (
               <div>
-                <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <h4 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                   Detected indicators
                 </h4>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {result.indicators.map((tag) => (
                     <span
                       key={tag}
-                      className="pill bg-slate-100 text-slate-700 ring-1 ring-inset ring-slate-200"
+                      className="pill bg-slate-100/70 text-slate-700 ring-1 ring-inset ring-slate-200/80"
                     >
                       {tag}
                     </span>
@@ -301,56 +259,67 @@ export function InlineAnalyzer() {
               </div>
             )}
 
-            {/* Recommendation */}
-            <div className="mt-auto rounded-lg bg-slate-50 p-4">
-              <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            <div className="mt-auto rounded-xl border border-slate-200/70 bg-white/60 p-4">
+              <h4 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                 Recommended action
               </h4>
-              <p className="mt-1 text-sm text-slate-700">{result.recommendedAction}</p>
+              <p className="mt-1.5 text-sm text-slate-700">{result.recommendedAction}</p>
             </div>
 
-            {/* Thresholds reference */}
-            <details className="text-xs text-slate-500">
-              <summary className="cursor-pointer font-medium hover:text-slate-700">
+            <details className="group text-xs text-slate-500">
+              <summary className="flex cursor-pointer select-none items-center gap-1.5 font-medium transition hover:text-slate-700">
+                <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="transition group-open:rotate-90" aria-hidden="true"><path d="M7 5l6 5-6 5" /></svg>
                 How scoring works
               </summary>
-              <div className="mt-2 space-y-1 rounded-lg bg-slate-50 p-3 text-slate-600">
-                <p><strong>Alert</strong> if: pH &lt; 6.5 or &gt; 8.6, turbidity &gt; 25 NTU, DO &lt; 4 mg/L, category = pollution, or keywords like oil/sheen/fish-kill.</p>
-                <p><strong>Watch</strong> if: pH 6.5–7.0 or 8.3–8.6, turbidity 10–25 NTU, temp &gt; 28 °C, or keywords like algae/debris.</p>
-                <p><strong>Info</strong> otherwise.</p>
-                <p>Score is the sum of weighted flags, clamped to 0–1. Severity maps to score: &ge; 0.5 = alert, &ge; 0.2 = watch, &lt; 0.2 = info.</p>
+              <div className="mt-3 space-y-1.5 rounded-xl bg-slate-50/80 p-3 text-slate-600">
+                <p><strong className="text-slate-800">Alert</strong> if: pH &lt; 6.5 or &gt; 8.6, turbidity &gt; 25 NTU, DO &lt; 4 mg/L, category = pollution, or keywords like oil/sheen/fish-kill.</p>
+                <p><strong className="text-slate-800">Watch</strong> if: pH 6.5–7.0 or 8.3–8.6, turbidity 10–25 NTU, temp &gt; 28 °C, or keywords like algae/debris.</p>
+                <p><strong className="text-slate-800">Info</strong> otherwise.</p>
               </div>
             </details>
           </div>
         ) : (
-          <div className="flex flex-1 items-center justify-center text-sm text-slate-400">
+          <div className="flex flex-1 items-center justify-center py-10 text-sm text-slate-400">
             Enter data on the left to see results.
           </div>
         )}
       </div>
+    </div>
+  );
+}
 
-      <style jsx global>{`
-        .az-input {
-          display: block;
-          width: 100%;
-          border-radius: 0.5rem;
-          border: 1px solid rgb(203 213 225);
-          background: #fff;
-          padding: 0.5rem 0.75rem;
-          font-size: 0.875rem;
-          color: rgb(15 23 42);
-          outline: none;
-          transition: box-shadow 0.15s, border-color 0.15s;
-        }
-        .az-input:focus {
-          border-color: rgb(45 144 255);
-          box-shadow: 0 0 0 3px rgba(45, 144, 255, 0.2);
-        }
-        textarea.az-input {
-          min-height: 4.5rem;
-          resize: vertical;
-        }
-      `}</style>
+function AzField({
+  label,
+  id,
+  value,
+  onChange,
+  step,
+  min,
+  max,
+}: {
+  label: string;
+  id: string;
+  value: string;
+  onChange: (v: string) => void;
+  step?: string;
+  min?: number;
+  max?: number;
+}) {
+  return (
+    <div>
+      <label htmlFor={id} className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+        {label}
+      </label>
+      <input
+        id={id}
+        type="number"
+        step={step}
+        min={min}
+        max={max}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="tt-input font-mono"
+      />
     </div>
   );
 }

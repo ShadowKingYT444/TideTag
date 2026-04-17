@@ -4,6 +4,7 @@
 
 :root {
   color-scheme: light;
+  --grid-color: rgba(15, 23, 42, 0.04);
 }
 
 html,
@@ -13,22 +14,118 @@ body {
 
 body {
   @apply bg-slate-50 text-slate-900 antialiased;
+  background-color: #f6f9fc;
   background-image:
-    radial-gradient(at 15% 0%, rgba(45, 144, 255, 0.12) 0px, transparent 50%),
-    radial-gradient(at 85% 10%, rgba(14, 124, 102, 0.08) 0px, transparent 55%);
+    radial-gradient(1200px 600px at 10% -10%, rgba(45, 144, 255, 0.14), transparent 60%),
+    radial-gradient(900px 500px at 95% 0%, rgba(14, 124, 102, 0.10), transparent 60%),
+    radial-gradient(700px 500px at 50% 120%, rgba(45, 144, 255, 0.06), transparent 70%);
   background-attachment: fixed;
+}
+
+/* Subtle grid texture overlay — adds depth without noise */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at center, black 40%, transparent 85%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 85%);
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
 }
 
 .leaflet-container {
   height: 100%;
   width: 100%;
+  border-radius: inherit;
+  font-family: inherit;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px -15px rgba(15, 23, 42, 0.25) !important;
+}
+
+/* ─── Glass design system ─────────────────────────────────────────── */
+
+@layer components {
+  .glass {
+    @apply rounded-2xl border border-white/60 bg-white/70 backdrop-blur-xl shadow-glass;
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.3) 100%);
+  }
+  .glass-card {
+    @apply glass p-5;
+  }
+  .glass-ring {
+    @apply ring-1 ring-slate-200/70;
+  }
+  .pill {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-b from-tide-500 to-tide-600 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_1px_0_rgba(255,255,255,0.35)_inset,0_6px_20px_-8px_rgba(22,112,245,0.55)] transition hover:from-tide-600 hover:to-tide-700 active:translate-y-px disabled:opacity-60;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white/80 px-4 py-2.5 text-sm font-semibold text-slate-800 backdrop-blur transition hover:bg-white hover:shadow-sm active:translate-y-px;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900;
+  }
+  .tt-input {
+    @apply block w-full rounded-xl border border-slate-200 bg-white/80 px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-tide-400 focus:bg-white focus:ring-4 focus:ring-tide-400/20;
+  }
+  textarea.tt-input {
+    min-height: 6rem;
+    resize: vertical;
+  }
+  .chip {
+    @apply rounded-full border border-slate-200/80 bg-white/70 px-3 py-1 text-xs font-medium text-slate-700 backdrop-blur transition hover:bg-white hover:shadow-sm;
+  }
+  .chip-active {
+    @apply border-transparent bg-slate-900 text-white shadow-sm;
+  }
+  .section-eyebrow {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-tide-200/80 bg-tide-50/70 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-tide-800 backdrop-blur;
+  }
+}
+
+/* Back-compat: keep old class name working */
+.tide-card {
+  @apply glass;
+}
+
+/* Focus-visible polish */
+:where(a, button, [role='button']):focus-visible {
+  outline: 2px solid theme('colors.tide.500');
+  outline-offset: 2px;
   border-radius: 0.75rem;
 }
 
-.tide-card {
-  @apply rounded-2xl bg-white/80 backdrop-blur border border-slate-200 shadow-sm;
+/* Scrollbar — light, unobtrusive */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
 }
-
-.pill {
-  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.14);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 23, 42, 0.24);
+  background-clip: padding-box;
+  border: 2px solid transparent;
 }
