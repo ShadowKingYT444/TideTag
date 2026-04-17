@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { CATEGORIES } from '@/lib/types';
 import type { Category } from '@/lib/types';
 
-type State = 'idle' | 'submitting' | 'error';
+type State = 'idle' | 'submitting' | 'success' | 'error';
 
 export function NewObservationForm() {
   const router = useRouter();
@@ -79,8 +79,11 @@ export function NewObservationForm() {
         setError(body?.error || 'Submission failed');
         return;
       }
-      router.push('/observations');
-      router.refresh();
+      setState('success');
+      setTimeout(() => {
+        router.push('/observations');
+        router.refresh();
+      }, 1800);
     } catch (err) {
       setState('error');
       setError(err instanceof Error ? err.message : 'Network error');
@@ -248,8 +251,14 @@ export function NewObservationForm() {
         </div>
       </fieldset>
 
+      {state === 'success' && (
+        <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800" role="status">
+          Observation submitted! Severity and indicators have been assigned automatically. Redirecting…
+        </div>
+      )}
+
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">
           {error}
         </div>
       )}
@@ -257,10 +266,10 @@ export function NewObservationForm() {
       <div className="flex items-center gap-3">
         <button
           type="submit"
-          disabled={state === 'submitting'}
+          disabled={state === 'submitting' || state === 'success'}
           className="rounded-lg bg-tide-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-tide-700 disabled:opacity-60"
         >
-          {state === 'submitting' ? 'Submitting…' : 'Submit observation'}
+          {state === 'submitting' ? 'Submitting…' : state === 'success' ? 'Submitted!' : 'Submit observation'}
         </button>
         <p className="text-xs text-slate-500">
           Severity and indicators are assigned automatically.

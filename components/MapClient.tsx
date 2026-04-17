@@ -12,19 +12,24 @@ export default function MapClient({ initial }: { initial: Observation[] }) {
   const [observations, setObservations] = useState<Observation[]>(initial);
   const [severity, setSeverity] = useState<Severity | 'all'>('all');
   const [category, setCategory] = useState<string>('all');
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
-  // Re-fetch from the API on mount so user submissions show up without
-  // needing a full page reload.
   useEffect(() => {
     let cancelled = false;
     fetch('/api/observations')
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error('Failed to refresh observations');
+        return r.json();
+      })
       .then((data) => {
         if (!cancelled && Array.isArray(data.observations)) {
           setObservations(data.observations);
+          setFetchError(null);
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        if (!cancelled) setFetchError(err.message);
+      });
     return () => {
       cancelled = true;
     };
@@ -73,6 +78,12 @@ export default function MapClient({ initial }: { initial: Observation[] }) {
           ))}
         </div>
       </div>
+
+      {fetchError && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800" role="alert">
+          Could not refresh observations: {fetchError}. Showing cached data.
+        </div>
+      )}
 
       <div className="tide-card h-[70vh] overflow-hidden p-0">
         <MapContainer center={center} zoom={6} scrollWheelZoom className="h-full w-full">
