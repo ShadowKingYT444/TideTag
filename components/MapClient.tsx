@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import L from 'leaflet';
 import { CircleMarker, MapContainer, Popup, TileLayer, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { LatLngBoundsExpression } from 'leaflet';
@@ -14,6 +15,7 @@ export default function MapClient({ initial }: { initial: Observation[] }) {
   const [severity, setSeverity] = useState<Severity | 'all'>('all');
   const [category, setCategory] = useState<string>('all');
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const canvasRenderer = useMemo(() => L.canvas({ padding: 0.35 }), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -55,6 +57,8 @@ export default function MapClient({ initial }: { initial: Observation[] }) {
     if (filtered.length === 0) return null;
     return filtered.map((o) => [o.lat, o.lng] as [number, number]);
   }, [filtered]);
+  const indexed = useMemo(() => filtered.slice(0, 250), [filtered]);
+  const markerRadius = filtered.length > 1000 ? 5 : 10;
 
   return (
     <div className="space-y-4">
@@ -107,12 +111,13 @@ export default function MapClient({ initial }: { initial: Observation[] }) {
               <CircleMarker
                 key={o.id}
                 center={[o.lat, o.lng]}
-                radius={10}
+                radius={markerRadius}
+                renderer={canvasRenderer}
                 pathOptions={{
                   color: '#ffffff',
                   fillColor: SEVERITY_COLORS[o.severity],
                   fillOpacity: 0.92,
-                  weight: 2,
+                  weight: filtered.length > 1000 ? 1 : 2,
                 }}
               >
                 <Popup>
@@ -144,6 +149,7 @@ export default function MapClient({ initial }: { initial: Observation[] }) {
             <div className="text-sm font-semibold text-slate-900">Observation index</div>
             <div className="mt-0.5 text-xs text-slate-500">
               {filtered.length} of {observations.length} sourced from the observations feed
+              {filtered.length > indexed.length ? `; showing newest ${indexed.length}` : ''}
             </div>
           </div>
           <div className="max-h-[calc(70vh-58px)] overflow-y-auto p-2">
@@ -152,7 +158,7 @@ export default function MapClient({ initial }: { initial: Observation[] }) {
                 No observations match these filters.
               </div>
             ) : (
-              filtered.map((o) => (
+              indexed.map((o) => (
                 <a
                   key={o.id}
                   href={`/observations/${o.id}`}
