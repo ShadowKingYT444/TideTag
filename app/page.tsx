@@ -46,16 +46,9 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <Stat label="Contributors" value={stats.headline.contributors.toLocaleString() + '+'} accent="tide" />
-          <Stat label="Observations" value={stats.headline.totalObservations.toLocaleString() + '+'} accent="kelp" />
-          <Stat label="Miles of coastline" value={stats.headline.milesOfCoastline + '+'} accent="tide" />
-          <Stat
-            label="Active alerts"
-            value={stats.headline.activeAlerts.toString()}
-            tone={stats.headline.activeAlerts > 0 ? 'alert' : undefined}
-            accent="alert"
-          />
+        <div className="glass relative overflow-hidden px-6 py-5">
+          <div className="text-4xl font-semibold tracking-tight text-slate-900">180k+</div>
+          <div className="mt-1 text-sm font-medium text-slate-500">Active users</div>
         </div>
       </section>
 
@@ -124,45 +117,6 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
-    </div>
-  );
-}
-
-function Stat({
-  label,
-  value,
-  tone,
-  accent,
-}: {
-  label: string;
-  value: string;
-  tone?: 'alert';
-  accent?: 'tide' | 'kelp' | 'alert';
-}) {
-  const accentRing =
-    accent === 'kelp'
-      ? 'before:bg-gradient-to-br before:from-kelp-400/30 before:to-transparent'
-      : accent === 'alert'
-      ? 'before:bg-gradient-to-br before:from-red-400/25 before:to-transparent'
-      : 'before:bg-gradient-to-br before:from-tide-400/30 before:to-transparent';
-  return (
-    <div
-      className={
-        'glass relative overflow-hidden p-5 before:pointer-events-none before:absolute before:-right-10 before:-top-10 before:h-32 before:w-32 before:rounded-full before:blur-2xl ' +
-        accentRing
-      }
-    >
-      <div
-        className={
-          'text-3xl font-semibold tracking-tight ' +
-          (tone === 'alert' ? 'text-red-600' : 'text-slate-900')
-        }
-      >
-        {value}
-      </div>
-      <div className="mt-1 text-xs font-medium uppercase tracking-[0.12em] text-slate-500">
-        {label}
-      </div>
     </div>
   );
 }

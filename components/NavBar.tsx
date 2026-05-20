@@ -10,7 +10,6 @@ const links = [
   { href: '/map', label: 'Map' },
   { href: '/observations', label: 'Observations' },
   { href: '/analyze', label: 'Analyze' },
-  { href: '/programs', label: 'Programs' },
 ];
 
 export function NavBar() {
