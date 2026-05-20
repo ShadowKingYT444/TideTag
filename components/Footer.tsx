@@ -16,7 +16,7 @@ export function Footer() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-10 gap-y-2 text-sm sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-x-10 gap-y-2 text-sm">
           <FooterCol heading="Platform">
             <FooterLink href="/dashboard">Dashboard</FooterLink>
             <FooterLink href="/map">Map</FooterLink>
@@ -27,16 +27,11 @@ export function Footer() {
             <FooterLink href="/observations/new">Submit</FooterLink>
             <FooterLink href="/programs">Programs</FooterLink>
           </FooterCol>
-          <FooterCol heading="Data">
-            <FooterLink href="/api/observations">/api/observations</FooterLink>
-            <FooterLink href="/api/stats">/api/stats</FooterLink>
-            <FooterLink href="/api/tides">/api/tides</FooterLink>
-          </FooterCol>
         </div>
       </div>
       <div className="border-t border-slate-200/60">
         <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-5 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-          <p>© {new Date().getFullYear()} TideTag</p>
+          <p>&copy; {new Date().getFullYear()} TideTag</p>
           <p className="text-slate-400">
             Tide data courtesy of{' '}
             <a

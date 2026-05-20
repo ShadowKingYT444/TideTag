@@ -10,24 +10,21 @@ export default function HomePage() {
 
   return (
     <div className="space-y-20 pb-10">
-      {/* ─── Hero ─────────────────────────────────────────────── */}
-      <section className="relative grid gap-10 pt-6 md:grid-cols-[1.15fr_1fr] md:items-center">
+      <section className="relative grid gap-10 pt-6 md:grid-cols-[1.05fr_0.95fr] md:items-center">
         <div className="animate-fade-up">
           <span className="section-eyebrow">
             <span className="h-1.5 w-1.5 rounded-full bg-tide-500" />
-            Citizen science · Coastal monitoring
+            Citizen science | Coastal monitoring
           </span>
-          <h1 className="mt-4 text-[40px] font-semibold leading-[1.05] tracking-tight text-slate-900 sm:text-[56px]">
-            Tag the tide.{' '}
+          <h1 className="mt-4 max-w-3xl text-[40px] font-semibold leading-[1.05] tracking-tight text-slate-950 sm:text-[58px]">
+            Tag the tide.
             <br className="hidden sm:block" />
-            <span className="bg-gradient-to-r from-tide-600 via-tide-500 to-kelp-500 bg-clip-text text-transparent">
-              Protect the coast.
-            </span>
+            <span className="text-tide-700"> Protect the coast.</span>
           </h1>
           <p className="mt-5 max-w-xl text-lg leading-relaxed text-slate-600">
-            TideTag turns student and community observations into near-real-time
-            signals for water quality, sediment dynamics, and pollution events —
-            backed by NOAA tide data and automated anomaly detection.
+            TideTag turns student and community observations into clear coastal
+            intelligence for water quality, sediment movement, wildlife health,
+            and pollution response.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link href="/observations/new" className="btn-primary">
@@ -39,61 +36,80 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-slate-500">
-            <Trust label="NOAA CO-OPS" />
-            <Trust label="Open data" />
-            <Trust label="Mobile-first" />
+            <Trust label="NOAA CO-OPS context" />
+            <Trust label="Open coastal reports" />
+            <Trust label="Mobile-first fieldwork" />
             <Trust label="No login required" />
           </div>
         </div>
 
-        <div className="glass relative overflow-hidden px-6 py-5">
-          <div className="text-4xl font-semibold tracking-tight text-slate-900">180k+</div>
-          <div className="mt-1 text-sm font-medium text-slate-500">Active users</div>
+        <div className="relative">
+          <div className="absolute -inset-3 rounded-[2rem] bg-tide-500/10 blur-2xl" aria-hidden />
+          <div className="glass relative overflow-hidden p-6 sm:p-7">
+            <div className="flex items-start justify-between gap-5">
+              <div>
+                <div className="text-sm font-semibold uppercase tracking-[0.14em] text-tide-800">
+                  Community reach
+                </div>
+                <div className="mt-3 text-[64px] font-black leading-none tracking-tight text-slate-950 sm:text-[82px]">
+                  180k+
+                </div>
+                <div className="mt-2 text-base font-semibold text-slate-700">
+                  active users connected to coastal monitoring programs
+                </div>
+              </div>
+              <div className="rounded-full border border-tide-200 bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-tide-800">
+                Live network
+              </div>
+            </div>
+
+            <div className="mt-8 grid grid-cols-3 gap-3 border-t border-slate-200/70 pt-5">
+              <MiniStat label="Current observations" value={stats.headline.totalObservations.toLocaleString()} />
+              <MiniStat label="Contributors" value={stats.headline.contributors.toLocaleString()} />
+              <MiniStat label="Active alerts" value={stats.headline.activeAlerts.toString()} />
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ─── How it works ───────────────────────────────────────── */}
       <section>
         <SectionHead
           eyebrow="How it works"
-          title="From a walk on the beach to an actionable signal"
+          title="From field notes to actionable signals"
           description="Three steps, designed for a phone in the field and a data team at the desk."
         />
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           <Step
             n={1}
             title="Observe"
-            body="Students and stewards log geotagged reports — photos, water-quality readings, and notes — from any phone."
+            body="Students and stewards log geotagged reports, photos, water-quality readings, and notes from any phone."
           />
           <Step
             n={2}
             title="Analyze"
-            body="Heuristics and geospatial cues tag indicators like algal blooms, oil sheen, and erosion, improving pollution-event detection by ~25%."
+            body="Heuristics and geospatial cues flag indicators like algal blooms, oil sheen, erosion, and low dissolved oxygen."
           />
           <Step
             n={3}
             title="Act"
-            body="Conservation partners triage alerts, route follow-ups, and share open data with schools, researchers, and local agencies."
+            body="Conservation partners triage alerts, route follow-ups, and share usable data with schools and local agencies."
           />
         </div>
       </section>
 
-      {/* ─── Live tidal context ───────────────────────────────── */}
       <section>
         <SectionHead
           eyebrow="Live data"
           title="Tide-aware observations"
-          description="Every submission is paired with live tide predictions from the nearest NOAA station so analysts can interpret measurements in context."
+          description="Every submission is paired with tide predictions from the nearest NOAA station so analysts can interpret measurements in context."
         />
         <div className="mt-6">
-          {/* Featured station: The Battery, NYC */}
           <TideContext lat={40.7} lng={-74.014} />
         </div>
       </section>
 
-      {/* ─── Recent observations ─────────────────────────────── */}
       <section>
-        <div className="flex items-end justify-between">
+        <div className="flex items-end justify-between gap-4">
           <SectionHead
             eyebrow="Network feed"
             title="Recent observations"
@@ -103,7 +119,7 @@ export default function HomePage() {
             href="/observations"
             className="hidden text-sm font-semibold text-tide-700 hover:text-tide-800 sm:inline"
           >
-            See all →
+            See all -&gt;
           </Link>
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -113,7 +129,7 @@ export default function HomePage() {
         </div>
         <div className="mt-6 sm:hidden">
           <Link href="/observations" className="btn-secondary w-full justify-center">
-            See all observations →
+            See all observations -&gt;
           </Link>
         </div>
       </section>
@@ -150,9 +166,18 @@ function SectionHead({
       <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
         {title}
       </h2>
-      {description && (
-        <p className="mt-2 max-w-2xl text-slate-600">{description}</p>
-      )}
+      {description && <p className="mt-2 max-w-2xl text-slate-600">{description}</p>}
+    </div>
+  );
+}
+
+function MiniStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <div className="text-xl font-bold tracking-tight text-slate-950">{value}</div>
+      <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+        {label}
+      </div>
     </div>
   );
 }

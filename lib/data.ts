@@ -89,12 +89,9 @@ export function getStats() {
     contributors.add(o.observer);
   }
 
-  // Headline metrics blend real store counts with the program-level
-  // figures from the founding brief (200+ contributors, 5,000+ observations,
-  // 120+ miles). Stored values are floors so the numbers only grow.
   const headline = {
-    totalObservations: Math.max(5187, items.length + 5000),
-    contributors: Math.max(214, contributors.size + 200),
+    totalObservations: items.length,
+    contributors: contributors.size,
     milesOfCoastline: 127,
     activeAlerts: bySeverity.alert,
   };

@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import { CircleMarker, MapContainer, Popup, TileLayer, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import type { LatLngBoundsExpression } from 'leaflet';
 import type { Observation, Severity } from '@/lib/types';
-import { SEVERITY_COLORS, CATEGORIES } from '@/lib/types';
+import { CATEGORIES, SEVERITY_COLORS } from '@/lib/types';
 
 const catLabel = Object.fromEntries(CATEGORIES.map((c) => [c.value, c.label]));
 
@@ -50,6 +51,11 @@ export default function MapClient({ initial }: { initial: Observation[] }) {
     return [lat, lng];
   }, [filtered]);
 
+  const bounds = useMemo<LatLngBoundsExpression | null>(() => {
+    if (filtered.length === 0) return null;
+    return filtered.map((o) => [o.lat, o.lng] as [number, number]);
+  }, [filtered]);
+
   return (
     <div className="space-y-4">
       <div className="glass flex flex-wrap items-center gap-3 p-3">
@@ -63,7 +69,7 @@ export default function MapClient({ initial }: { initial: Observation[] }) {
               active={category === c.value}
               onClick={() => setCategory(c.value)}
             >
-              <span aria-hidden>{c.emoji}</span> {c.label}
+              {c.label}
             </FilterChip>
           ))}
         </div>
@@ -85,50 +91,99 @@ export default function MapClient({ initial }: { initial: Observation[] }) {
 
       {fetchError && (
         <div className="rounded-xl border border-amber-200/70 bg-amber-50/80 px-4 py-2 text-sm text-amber-800 backdrop-blur" role="alert">
-          Could not refresh observations: {fetchError}. Showing cached data.
+          Could not refresh observations: {fetchError}. Showing server-rendered data.
         </div>
       )}
 
-      <div className="glass relative h-[70vh] overflow-hidden p-0">
-        <MapContainer center={center} zoom={6} scrollWheelZoom className="h-full w-full">
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          {filtered.map((o) => (
-            <CircleMarker
-              key={o.id}
-              center={[o.lat, o.lng]}
-              radius={9}
-              pathOptions={{
-                color: '#ffffff',
-                fillColor: SEVERITY_COLORS[o.severity],
-                fillOpacity: 0.9,
-                weight: 2,
-              }}
-            >
-              <Popup>
-                <div className="space-y-1 font-sans">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
-                    {catLabel[o.category]} · {o.severity}
-                  </div>
-                  <div className="text-[15px] font-semibold text-slate-900">
-                    {o.locationName}
-                  </div>
-                  <div className="text-sm leading-relaxed text-slate-700">
-                    {o.description}
-                  </div>
-                  <div className="text-[11px] text-slate-500">by {o.observer}</div>
-                  {o.indicators.length > 0 && (
-                    <div className="pt-1 text-[11px] text-slate-600">
-                      {o.indicators.join(', ')}
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="glass relative h-[70vh] min-h-[480px] overflow-hidden p-0">
+          <MapContainer center={center} zoom={6} scrollWheelZoom className="h-full w-full">
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <FitBounds bounds={bounds} />
+            {filtered.map((o) => (
+              <CircleMarker
+                key={o.id}
+                center={[o.lat, o.lng]}
+                radius={10}
+                pathOptions={{
+                  color: '#ffffff',
+                  fillColor: SEVERITY_COLORS[o.severity],
+                  fillOpacity: 0.92,
+                  weight: 2,
+                }}
+              >
+                <Popup>
+                  <div className="space-y-1 font-sans">
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+                      {catLabel[o.category]} | {o.severity}
                     </div>
-                  )}
-                </div>
-              </Popup>
-            </CircleMarker>
-          ))}
-        </MapContainer>
+                    <div className="text-[15px] font-semibold text-slate-900">
+                      {o.locationName}
+                    </div>
+                    <div className="text-sm leading-relaxed text-slate-700">
+                      {o.description}
+                    </div>
+                    <div className="text-[11px] text-slate-500">by {o.observer}</div>
+                    {o.indicators.length > 0 && (
+                      <div className="pt-1 text-[11px] text-slate-600">
+                        {o.indicators.join(', ')}
+                      </div>
+                    )}
+                  </div>
+                </Popup>
+              </CircleMarker>
+            ))}
+          </MapContainer>
+        </div>
+
+        <aside className="glass max-h-[70vh] min-h-[480px] overflow-hidden p-0">
+          <div className="border-b border-slate-200/70 px-4 py-3">
+            <div className="text-sm font-semibold text-slate-900">Observation index</div>
+            <div className="mt-0.5 text-xs text-slate-500">
+              {filtered.length} of {observations.length} sourced from the observations feed
+            </div>
+          </div>
+          <div className="max-h-[calc(70vh-58px)] overflow-y-auto p-2">
+            {filtered.length === 0 ? (
+              <div className="px-3 py-8 text-center text-sm text-slate-500">
+                No observations match these filters.
+              </div>
+            ) : (
+              filtered.map((o) => (
+                <a
+                  key={o.id}
+                  href={`/observations/${o.id}`}
+                  className="block rounded-xl px-3 py-3 transition hover:bg-white/80"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-semibold text-slate-900">
+                        {o.locationName}
+                      </div>
+                      <div className="mt-0.5 text-xs text-slate-500">
+                        {catLabel[o.category]} | {new Date(o.createdAt).toLocaleDateString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </div>
+                    </div>
+                    <span
+                      className="h-2.5 w-2.5 shrink-0 rounded-full ring-2 ring-white"
+                      style={{ background: SEVERITY_COLORS[o.severity] }}
+                      aria-label={o.severity}
+                    />
+                  </div>
+                  <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-slate-600">
+                    {o.description}
+                  </p>
+                </a>
+              ))
+            )}
+          </div>
+        </aside>
       </div>
 
       <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
@@ -141,6 +196,20 @@ export default function MapClient({ initial }: { initial: Observation[] }) {
       </div>
     </div>
   );
+}
+
+function FitBounds({ bounds }: { bounds: LatLngBoundsExpression | null }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!bounds) return;
+    map.fitBounds(bounds, {
+      maxZoom: 8,
+      padding: [36, 36],
+    });
+  }, [bounds, map]);
+
+  return null;
 }
 
 function FilterChip({
